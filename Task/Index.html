@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>SASTRA Expense Tracker</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <h1>SASTRA Expense Tracker 🪙💴</h1>
+  <div class="container">
+    <h3>Add Expense</h3>
+    <div class="input-group">
+      <input type="number" id="amount" placeholder="Amount (₹)">
+      <select id="category">
+        <option value="Canteen">Canteen</option>
+        <option value="Travel">Travel</option>
+        <option value="Books">Books</option>
+        <option value="Misc">Misc</option>
+      </select>
+      <input type="text" id="desc" placeholder="Description">
+      <input type="date" id="date">
+      <button onclick="addExpense()">╋ Add</button>
+    </div>
+
+    <h3>Expenses</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Amount (₹)</th>
+          <th>Category</th>
+          <th>Description</th>
+          <th>Date</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="expenseTable"></tbody>
+    </table>
+
+    <h3>Category Summary</h3>
+    <canvas id="expenseChart"></canvas>
+  </div>
+
+  <div class="footer">
+    © 2025 SASTRA Expense Tracker
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
