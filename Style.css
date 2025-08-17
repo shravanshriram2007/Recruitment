@@ -1,0 +1,120 @@
+body {
+  font-family: 'Poppins', sans-serif;
+  margin: 0;
+  padding: 0;
+  background: linear-gradient(123deg,#DCA06D,#b07746);
+  color: #252525;
+  min-height: 100vh;
+  display: flex;    
+  flex-direction: column;
+}
+
+h1 {
+  text-align: center;
+  color: rgb(0, 0, 0);
+  padding: 20px;
+  margin: 0;
+  letter-spacing: 1px;
+  font-family:Poppins, sans-serif;
+  font-weight: lighter;
+}
+
+.container {
+  flex: 1;
+  max-width: 900px;
+  margin: 30px auto;
+  background: #A55B4B;
+  border-radius: 20px;
+  padding: 30px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+  animation: fadeIn 3s ease-in-out;
+}
+
+h3 {
+  margin-top: 20px;
+  color: #19191B;
+  border-left: 5px solid #DCA06D;
+  padding-left: 8px;
+}
+.input-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+input, select {
+  flex: 1;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  transition: all 0.3s;
+}
+
+input:focus, select:focus {
+  outline: none;
+  border-color: #43cea2;
+  box-shadow: 0 0 8px #43cea266;
+}
+
+button {
+  padding: 12px 20px;
+  border-radius: 10px;
+  border: none;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: rgb(0, 0, 0);
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  overflow: hidden;
+  border-radius: 12px;
+}
+
+th, td {
+  padding: 12px;
+  text-align: center;
+}
+
+th {
+  background: #185a9d;
+  color: rgb(11, 10, 10);
+}
+tr:nth-child(even) {
+  background: #ffffff;
+}
+
+tr:nth-child(odd) {
+  background: #ffffff;
+}
+
+tr:hover {
+  background: #e8f4fc;
+}
+
+.footer {
+  text-align: center;
+  color: white;
+  padding: 12px;
+  font-size: 14px;
+  background: rgba(0,0,0,0.25);
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+canvas {
+  height: 50px;
+  margin-top: 20px;
+}
