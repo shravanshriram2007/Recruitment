@@ -11,15 +11,15 @@
   <div class="container">
     <h3>Add Expense</h3>
     <div class="input-group">
-      <input type="number" id="amount" placeholder="Amount (₹)">
+      <input class="inp-ele" type="number" id="amount" placeholder="Amount (₹)">
       <select id="category">
         <option value="Canteen">Canteen</option>
         <option value="Travel">Travel</option>
         <option value="Books">Books</option>
         <option value="Misc">Misc</option>
       </select>
-      <input type="text" id="desc" placeholder="Description">
-      <input type="date" id="date">
+      <input class="inp-ele" type="text" id="desc" placeholder="Description">
+      <input class="inp-ele" type="date" id="date">
       <button onclick="addExpense()">╋ Add</button>
     </div>
 
@@ -37,11 +37,8 @@
       <tbody id="expenseTable"></tbody>
     </table>
 
-    <!-- Summary section hidden initially -->
-    <div id="summarySection" style="display:none;">
-      <h3>Category Summary</h3>
-      <canvas id="expenseChart"></canvas>
-    </div>
+    <h3>Category Summary</h3>
+    <canvas id="expenseChart"></canvas>
   </div>
 
   <div class="footer">
@@ -50,4 +47,5 @@
 
   <script src="script.js"></script>
 </body>
+
 </html>
