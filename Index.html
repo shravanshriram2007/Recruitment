@@ -21,6 +21,7 @@
       <input type="text" id="desc" placeholder="Description">
       <input type="date" id="date">
       <button onclick="addExpense()">╋ Add</button>
+      <button onclick="clearAll()" class="danger">🗑 Clear All</button>
     </div>
 
     <h3>Expenses</h3>
@@ -41,6 +42,21 @@
     <div id="summarySection" style="display:none;">
       <h3>Category Summary</h3>
       <canvas id="expenseChart"></canvas>
+    </div>
+  </div>
+
+  <!-- ✅ Chatbot Toggle Button -->
+  <div id="chat-toggle" onclick="toggleChat()">💬</div>
+
+  <!-- Chatbot Widget -->
+  <div id="chatbot" style="display:none;">
+    <div id="chat-header" onmousedown="startDrag(event)">💬 Expense Assistant 
+      <span id="close-chat" onclick="toggleChat()">✖</span>
+    </div>
+    <div id="chat-messages"></div>
+    <div id="chat-input">
+      <input type="text" id="chatText" placeholder="Ask me anything...">
+      <button onclick="sendMessage()">Send</button>
     </div>
   </div>
 
