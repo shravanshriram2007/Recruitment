@@ -1,13 +1,26 @@
 let expenses = JSON.parse(localStorage.getItem("expenses")) || [];
 let chart;
+let chartType = "pie";
 let editIndex = null;
 let dragOffsetX,
   dragOffsetY,
   isDragging = false;
+const MONTHLY_BUDGET = 5000;
+
+const categoryColors = {
+  Canteen: "#f87171",
+  Travel: "#22d3ee",
+  Books: "#818cf8",
+  Misc: "#fbbf24",
+};
 
 function toggleSummaryVisibility() {
   const summary = document.getElementById("summarySection");
   summary.style.display = expenses.length === 0 ? "none" : "block";
+}
+
+function showError(msg) {
+  alert(msg);
 }
 
 function addExpense() {
@@ -17,15 +30,15 @@ function addExpense() {
   let date = document.getElementById("date").value;
 
   if (!amount || amount <= 0) {
-    alert("Please enter a valid amount!");
+    showError("Please enter a valid amount!");
     return;
   }
   if (!date) {
-    alert("Please enter a valid date!");
+    showError("Please enter a valid date!");
     return;
   }
   if (new Date(date) > new Date()) {
-    alert("Future dates are not allowed!");
+    showError("Future dates are not allowed!");
     return;
   }
 
@@ -47,6 +60,7 @@ function addExpense() {
   localStorage.setItem("expenses", JSON.stringify(expenses));
   displayExpenses();
   updateChart();
+  updateBudgetBar();
 
   document.getElementById("amount").value = "";
   document.getElementById("desc").value = "";
@@ -61,12 +75,16 @@ function displayExpenses() {
   expenses.forEach((exp, index) => {
     total += exp.amount;
     let row = `<tr id="row-${index}">
-      <td>₹${exp.amount}</td>
-      <td>${exp.category}</td>
+      <td style="color:${categoryColors[exp.category] || "#e2e8f0"}">₹${
+      exp.amount
+    }</td>
+      <td style="color:${categoryColors[exp.category] || "#e2e8f0"}">${
+      exp.category
+    }</td>
       <td>${exp.desc || "-"}</td>
       <td>${formatDate(exp.date)}</td>
       <td>
-        <button onclick="editExpense(${index})">Edit</button>
+        <button onclick="editExpense(${index})">✏️</button>
         <button onclick="deleteExpense(${index})">❌</button>
       </td>
     </tr>`;
@@ -74,7 +92,7 @@ function displayExpenses() {
   });
 
   if (expenses.length > 0) {
-    let totalRow = `<tr style="font-weight:bold; background:#eee">
+    let totalRow = `<tr style="font-weight:bold; background:#334155; color:#f1f5f9">
       <td colspan="5">Total: ₹${total}</td>
     </tr>`;
     table.innerHTML += totalRow;
@@ -107,6 +125,7 @@ function deleteExpense(index) {
   localStorage.setItem("expenses", JSON.stringify(expenses));
   displayExpenses();
   updateChart();
+  updateBudgetBar();
 }
 
 function clearAll() {
@@ -115,6 +134,7 @@ function clearAll() {
     localStorage.removeItem("expenses");
     displayExpenses();
     updateChart();
+    updateBudgetBar();
   }
 }
 
@@ -134,23 +154,23 @@ function updateChart() {
   if (chart) chart.destroy();
 
   if (expenses.length > 0) {
-    const categoryColors = {
-      Canteen: "#ff7675",
-      Travel: "#43cea2",
-      Books: "#667eea",
-      Misc: "#fdcb6e",
-    };
-
     chart = new Chart(ctx, {
-      type: "pie",
+      type: chartType,
       data: {
         labels: Object.keys(categoryTotals),
         datasets: [
           {
             data: Object.values(categoryTotals),
             backgroundColor: Object.keys(categoryTotals).map(
-              (cat) => categoryColors[cat] || "#ccc"
+              (cat) => categoryColors[cat] || "#64748b"
             ),
+            borderRadius: chartType === "bar" ? 12 : 0,
+            borderWidth: 2,
+            borderColor: "#0f172a",
+            hoverOffset: 12,
+            radius: chartType === "pie" ? "75%" : undefined,
+            barThickness: chartType === "bar" ? 40 : undefined,
+            maxBarThickness: chartType === "bar" ? 50 : undefined,
           },
         ],
       },
@@ -160,21 +180,66 @@ function updateChart() {
           legend: {
             position: "bottom",
             labels: {
-              color: "black",
+              color: "#f1f5f9",
               font: {
+                family: "Inter, sans-serif",
                 size: 14,
-                weight: "bold",
-                family: "Arial, sans-serif",
+                weight: "600",
               },
+              padding: 14,
             },
           },
+          tooltip: {
+            backgroundColor: "#1e293b",
+            titleColor: "#f1f5f9",
+            bodyColor: "#e2e8f0",
+            borderColor: "#334155",
+            borderWidth: 1,
+          },
         },
+        scales:
+          chartType === "bar"
+            ? {
+                x: {
+                  ticks: {
+                    color: "#f1f5f9",
+                    font: {
+                      family: "Inter, sans-serif",
+                      size: 13,
+                      weight: "500",
+                    },
+                  },
+                  grid: { color: "rgba(255,255,255,0.1)" },
+                },
+                y: {
+                  beginAtZero: true,
+                  ticks: {
+                    color: "#f1f5f9",
+                    font: {
+                      family: "Inter, sans-serif",
+                      size: 13,
+                      weight: "500",
+                    },
+                  },
+                  grid: { color: "rgba(255,255,255,0.1)" },
+                },
+              }
+            : {},
       },
     });
   }
 }
 
-/* ✅ Chatbot Functions */
+function toggleChartType() {
+  chartType = chartType === "pie" ? "bar" : "pie";
+  updateChart();
+}
+
+function updateBudgetBar() {
+  let total = expenses.reduce((sum, exp) => sum + exp.amount, 0);
+  let percent = Math.min((total / MONTHLY_BUDGET) * 100, 100);
+  document.getElementById("budgetBar").style.width = percent + "%";
+}
 function toggleChat() {
   const chatbot = document.getElementById("chatbot");
   const toggleBtn = document.getElementById("chat-toggle");
@@ -185,14 +250,15 @@ function toggleChat() {
     toggleBtn.style.display = "none";
 
     if (chatBox.innerHTML.trim() === "") {
-      chatBox.innerHTML = `<div><b>Bot:</b> 👋 Hi! I can help you with your expenses.<br>
-        - "What is my total?"<br>
-        - "What is my biggest expense?"<br>
-        - "Add 200 to Canteen today"<br>
-        - "Show me Travel expenses"<br>
-        - "Expenses this month"<br>
-        - "Clear all expenses"<br>
-        - "help" (see all options)</div>`;
+      chatBox.innerHTML = `<div style=\"background:#273449; padding:8px; border-radius:8px; margin-bottom:6px; color:#e2e8f0\"><b>Bot:</b> 👋 Hi! I can help you with your expenses.<br>
+        - \"What is my total?\"<br>
+        - \"What is my biggest expense?\"<br>
+        - \"Add 200 to Canteen today\"<br>
+        - \"Show me Travel expenses\"<br>
+        - \"Expenses this month\"<br>
+        - \"Expenses last week\"<br>
+        - \"Expenses in July\"<br>
+        - \"Clear all expenses\"</div>`;
     }
   } else {
     chatbot.style.display = "none";
@@ -205,15 +271,25 @@ function sendMessage() {
   if (!input) return;
 
   let chatBox = document.getElementById("chat-messages");
-  chatBox.innerHTML += `<div><b>You:</b> ${input}</div>`;
+  chatBox.innerHTML += `<div style=\"background:#374151; padding:6px; border-radius:6px; margin-bottom:6px; color:#f1f5f9\"><b>You:</b> ${input}</div>`;
 
-  let response = "I didn’t understand that.";
+  let response = handleChatCommand(input);
+
+  chatBox.innerHTML += `<div style=\"background:#273449; padding:6px; border-radius:6px; margin-bottom:6px; color:#e2e8f0\"><b>Bot:</b> ${response}</div>`;
+  chatBox.scrollTop = chatBox.scrollHeight;
+
+  document.getElementById("chatText").value = "";
+}
+
+function handleChatCommand(input) {
   let lowerInput = input.toLowerCase();
 
   if (lowerInput.includes("total")) {
     let total = expenses.reduce((sum, exp) => sum + exp.amount, 0);
-    response = `Your total expenses are ₹${total}.`;
-  } else if (lowerInput.includes("biggest")) {
+    return `Your total expenses are <b style=\"color:#818cf8\">₹${total}</b>.`;
+  }
+
+  if (lowerInput.includes("biggest")) {
     let categoryTotals = {};
     expenses.forEach((exp) => {
       categoryTotals[exp.category] =
@@ -223,83 +299,95 @@ function sendMessage() {
       let maxCat = Object.keys(categoryTotals).reduce((a, b) =>
         categoryTotals[a] > categoryTotals[b] ? a : b
       );
-      response = `Your biggest spending is on ${maxCat} (₹${categoryTotals[maxCat]}).`;
+      return `Your biggest spending is on <b style=\"color:${categoryColors[maxCat]}\">${maxCat}</b> (₹${categoryTotals[maxCat]}).`;
     } else {
-      response = "No expenses recorded yet.";
+      return "No expenses recorded yet.";
     }
-  } else if (lowerInput.includes("clear all")) {
-    clearAll();
-    response = "All expenses cleared!";
-  } else if (lowerInput.startsWith("add")) {
-    let match = input.match(/add\s+(\d+)\s+(?:to\s+)?(\w+)/i);
+  }
+
+  if (lowerInput.startsWith("add")) {
+    let match = input.match(/add (\d+) to (\w+)(?: on (.+))?/i);
     if (match) {
       let amount = parseFloat(match[1]);
-      let category =
-        match[2].charAt(0).toUpperCase() + match[2].slice(1).toLowerCase();
-      let date = new Date().toISOString().split("T")[0];
-      let expense = { amount, category, desc: "Added via chat", date };
-      expenses.push(expense);
+      let category = match[2].charAt(0).toUpperCase() + match[2].slice(1);
+      let date = match[3] ? new Date(match[3]) : new Date();
+      if (isNaN(amount) || !categoryColors[category]) {
+        return "I couldn’t understand the category or amount.";
+      }
+      expenses.push({
+        amount,
+        category,
+        desc: "Added via chat",
+        date: date.toISOString().split("T")[0],
+      });
       localStorage.setItem("expenses", JSON.stringify(expenses));
       displayExpenses();
       updateChart();
-      response = `Added ₹${amount} to ${category} (today).`;
-    } else {
-      response = "Please use format: Add 200 to Canteen today.";
+      updateBudgetBar();
+      return `Added <b>₹${amount}</b> to <b style=\"color:${categoryColors[category]}\">${category}</b>!`;
     }
-  } else if (lowerInput.startsWith("show me")) {
-    let match = input.match(/show me (\w+)/i);
-    if (match) {
-      let category =
-        match[1].charAt(0).toUpperCase() + match[1].slice(1).toLowerCase();
-      let filtered = expenses.filter((exp) => exp.category === category);
-      if (filtered.length > 0) {
-        response =
-          `Here are your ${category} expenses:<br>` +
-          filtered
-            .map((exp) => `- ₹${exp.amount} (${formatDate(exp.date)})`)
-            .join("<br>");
-      } else {
-        response = `No expenses found in ${category}.`;
-      }
-    }
-  } else if (lowerInput.includes("this month")) {
-    let now = new Date();
-    let filtered = expenses.filter((exp) => {
-      let d = new Date(exp.date);
-      return (
-        d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear()
-      );
-    });
-    if (filtered.length > 0) {
-      let total = filtered.reduce((sum, exp) => sum + exp.amount, 0);
-      response =
-        `Your expenses this month are ₹${total}.<br>` +
-        filtered
-          .map(
-            (exp) =>
-              `- ₹${exp.amount} (${exp.category}, ${formatDate(exp.date)})`
-          )
-          .join("<br>");
-    } else {
-      response = "No expenses recorded this month.";
-    }
-  } else if (lowerInput.includes("help")) {
-    response = `I can help you with:<br>
-      - "What is my total?"<br>
-      - "What is my biggest expense?"<br>
-      - "Add 200 to Canteen today"<br>
-      - "Show me Travel expenses"<br>
-      - "Expenses this month"<br>
-      - "Clear all expenses"`;
+    return "Try: Add 200 to Travel today";
   }
 
-  chatBox.innerHTML += `<div><b>Bot:</b> ${response}</div>`;
-  chatBox.scrollTop = chatBox.scrollHeight;
+  if (lowerInput.includes("show me")) {
+    let catMatch = input.match(/show me (\w+)/i);
+    if (catMatch) {
+      let category = catMatch[1].charAt(0).toUpperCase() + catMatch[1].slice(1);
+      let total = expenses
+        .filter((e) => e.category === category)
+        .reduce((sum, e) => sum + e.amount, 0);
+      return total > 0
+        ? `You’ve spent <b>₹${total}</b> on <b style=\"color:${categoryColors[category]}\">${category}</b>.`
+        : `No expenses found for ${category}.`;
+    }
+  }
+  if (lowerInput.includes("this month")) {
+    let now = new Date();
+    let total = expenses
+      .filter((e) => {
+        let d = new Date(e.date);
+        return (
+          d.getMonth() === now.getMonth() &&
+          d.getFullYear() === now.getFullYear()
+        );
+      })
+      .reduce((sum, e) => sum + e.amount, 0);
+    return `This month’s expenses: <b>₹${total}</b>`;
+  }
 
-  document.getElementById("chatText").value = "";
+  if (lowerInput.includes("last week")) {
+    let now = new Date();
+    let weekAgo = new Date();
+    weekAgo.setDate(now.getDate() - 7);
+    let total = expenses
+      .filter((e) => {
+        let d = new Date(e.date);
+        return d >= weekAgo && d <= now;
+      })
+      .reduce((sum, e) => sum + e.amount, 0);
+    return `Expenses in the last 7 days: <b>₹${total}</b>`;
+  }
+
+  let monthMatch = input.match(/expenses in (\w+)/i);
+  if (monthMatch) {
+    let monthName = monthMatch[1].toLowerCase();
+    let monthIndex = new Date(Date.parse(monthName + " 1, 2023")).getMonth();
+    let total = expenses
+      .filter((e) => new Date(e.date).getMonth() === monthIndex)
+      .reduce((sum, e) => sum + e.amount, 0);
+    return `Expenses in ${
+      monthName.charAt(0).toUpperCase() + monthName.slice(1)
+    }: <b>₹${total}</b>`;
+  }
+
+  if (lowerInput.includes("clear all")) {
+    clearAll();
+    return "All expenses cleared!";
+  }
+
+  return "I didn’t understand that. Try: Add 200 to Travel today, Show me Canteen expenses, or Expenses this month.";
 }
 
-/* ✅ Dragging Logic */
 function startDrag(e) {
   isDragging = true;
   const chatbot = document.getElementById("chatbot");
@@ -319,19 +407,3 @@ function drag(e) {
     chatbot.style.position = "fixed";
   }
 }
-
-function stopDrag() {
-  isDragging = false;
-  document.removeEventListener("mousemove", drag);
-  document.removeEventListener("mouseup", stopDrag);
-}
-
-document.getElementById("chatText").addEventListener("keypress", function (e) {
-  if (e.key === "Enter") {
-    e.preventDefault();
-    sendMessage();
-  }
-});
-
-displayExpenses();
-updateChart();
