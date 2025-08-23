@@ -4,27 +4,31 @@
   <meta charset="UTF-8">
   <title>SASTRA Expense Tracker</title>
   <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-  <h1>SASTRA Expense Tracker 🪙💴</h1>
+  <header>
+    <h1>💰 SASTRA Expense Tracker</h1>
+  </header>
+
   <div class="container">
-    <h3>Add Expense</h3>
+    <h3>➕ Add Expense</h3>
     <div class="input-group">
-      <input type="number" id="amount" placeholder="Amount (₹)">
+      <input type="number" id="amount" placeholder="💵 Amount (₹)">
       <select id="category">
-        <option value="Canteen">Canteen</option>
-        <option value="Travel">Travel</option>
-        <option value="Books">Books</option>
-        <option value="Misc">Misc</option>
+        <option value="Canteen">🍔 Canteen</option>
+        <option value="Travel">🚌 Travel</option>
+        <option value="Books">📚 Books</option>
+        <option value="Misc">✨ Misc</option>
       </select>
-      <input type="text" id="desc" placeholder="Description">
+      <input type="text" id="desc" placeholder="📝 Description">
       <input type="date" id="date">
       <button onclick="addExpense()">╋ Add</button>
       <button onclick="clearAll()" class="danger">🗑 Clear All</button>
     </div>
 
-    <h3>Expenses</h3>
+    <h3>📊 Expenses</h3>
     <table>
       <thead>
         <tr>
@@ -38,31 +42,30 @@
       <tbody id="expenseTable"></tbody>
     </table>
 
-    <!-- Summary section hidden initially -->
     <div id="summarySection" style="display:none;">
-      <h3>Category Summary</h3>
+      <h3>📈 Category Summary</h3>
       <canvas id="expenseChart"></canvas>
     </div>
+    <div class="chart-container">
+  <canvas id="expenseChart"></canvas>
+</div>
   </div>
 
-  <!-- ✅ Chatbot Toggle Button -->
   <div id="chat-toggle" onclick="toggleChat()">💬</div>
-
-  <!-- Chatbot Widget -->
   <div id="chatbot" style="display:none;">
-    <div id="chat-header" onmousedown="startDrag(event)">💬 Expense Assistant 
+    <div id="chat-header" onmousedown="startDrag(event)">🤖 Expense Assistant 
       <span id="close-chat" onclick="toggleChat()">✖</span>
     </div>
     <div id="chat-messages"></div>
     <div id="chat-input">
-      <input type="text" id="chatText" placeholder="Ask me anything...">
-      <button onclick="sendMessage()">Send</button>
+      <input type="text" id="chatText" placeholder="Type your question...">
+      <button onclick="sendMessage()">➤</button>
     </div>
   </div>
 
-  <div class="footer">
-    © 2025 SASTRA Expense Tracker
-  </div>
+  <footer class="footer">
+    © 2025 SASTRA Expense Tracker • Designed with ❤️
+  </footer>
 
   <script src="script.js"></script>
 </body>
